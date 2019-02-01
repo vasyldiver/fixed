@@ -1,5 +1,5 @@
 /*
- * Class fixed - floating point emulation using integer (64-bit) arithmetic
+ * Class fixed - floating point fast emulation using integer (64-bit) arithmetic
  * 
  * On some hardware platforms (especially without FPU - math coprocessor), integer arithmetic operations are performed significantly faster than floating point operations
  * 
