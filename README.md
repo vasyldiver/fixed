@@ -5,6 +5,7 @@ Class fixed: floating point fast emulation using integer (64-bit) arithmetic
  * 
  * On some hardware platforms (especially without FPU - math coprocessor), integer arithmetic operations are performed significantly faster than floating point operations
  * 
+ * To perform operations on floating point numbers using integer arithmetic
  * floating point value is multiplied by 2^24, the integer part is taken and stored as a 64-bit signed integer (int64_t)
  * thus it can be considered that 40 bits (out of 64) are used for the integer part, and 24 bits for the fractional (non-integer in binary representation) part of a real number
  * 
@@ -28,6 +29,7 @@ Class fixed: floating point fast emulation using integer (64-bit) arithmetic
  * 
  * На некоторых аппаратных платформах (особенно без математического сопроцессора) целочисленные арифметические операции выполняются существенно быстрее операций с плавающей запятой
  * 
+ * Для выполнения операций над числами с плавающей запятой с помощью целочисленной арифметики
  * вещественнное число с плавающей запятой умножается на 2^24, берётся целая часть и хранится как 64-битное знаковое целое (тип int64_t)
  * таким образом можно считать что 40 бит (из 64) используются для целой части, а 24 бита - для дробной (не целой в двоичном представлении) части вещественного числа
  * 
