@@ -185,12 +185,13 @@ public:
   
 #ifndef __fixed_use_float_for_div      
   //
-  inline fixed& operator /=(const  int16_t &x)  { ff /= x;  return (*this); }
-  inline fixed& operator /=(const  int32_t &x)  { ff /= x;  return (*this); }
-  inline fixed& operator /=(const  int64_t &x)  { ff /= x;  return (*this); }
-  inline fixed& operator /=(const uint16_t &x)  { ff /= x;  return (*this); }
-  inline fixed& operator /=(const uint32_t &x)  { ff /= x;  return (*this); }
-  inline fixed& operator /=(const uint64_t &x)  { ff /= x;  return (*this); }
+  inline fixed& operator /=(const  int16_t &x)  { if(x !=  int16_t(0)) { ff /= x; return (*this); }  else { return operator /=(fixed(x)); } }
+  inline fixed& operator /=(const  int32_t &x)  { if(x !=  int32_t(0)) { ff /= x; return (*this); }  else { return operator /=(fixed(x)); } }   // if division by zero - resolve this problem by 'fixed' class standart method
+  inline fixed& operator /=(const  int64_t &x)  { if(x !=  int64_t(0)) { ff /= x; return (*this); }  else { return operator /=(fixed(x)); } }
+  inline fixed& operator /=(const uint16_t &x)  { if(x != uint16_t(0)) { ff /= x; return (*this); }  else { return operator /=(fixed(x)); } }
+  inline fixed& operator /=(const uint32_t &x)  { if(x != uint32_t(0)) { ff /= x; return (*this); }  else { return operator /=(fixed(x)); } }
+  inline fixed& operator /=(const uint64_t &x)  { if(x != uint64_t(0)) { ff /= x; return (*this); }  else { return operator /=(fixed(x)); } }
+  //inline fixed& operator /=(const uint64_t &x)  { ff /= x;  return (*this); }
   //
 #endif
 
@@ -467,11 +468,27 @@ inline fixed fixed::operator / (const fixed &x) const
   //y.ff = ((ff<<8) / (x.ff>>8)) << 8; 
   //y.ff = ((ff<<10) / (x.ff>>8)) << 6;
   
-  a <<= 10;  b >>= 8;  a /= b;  a <<= 6;
+  a <<= 10;  b >>= 8;
   
-  if(sign!=false)  { a = -a; }          // correct sign
+  if(b != int64_t(0))
+  {
+    a /= b;  a <<= 6;
   
-  z.ff = a;
+    if(sign!=false)  { a = -a; }             // correct sign
+  
+    z.ff = a;
+  }
+  else
+  {
+    if( ff * x.ff >= 0 )
+    {
+      z.ff = ( !(uint64_t(0)) ) >> 2;        // just very big positive value
+    }
+    else
+    {
+      z.ff = -( ( !(uint64_t(0)) ) >> 2);    // just very big negative value
+    }
+  }
   
 #endif
   
@@ -499,11 +516,27 @@ inline fixed& fixed::operator /= (const fixed &x)
   //y.ff = ((ff<<8) / (x.ff>>8)) << 8; 
   //y.ff = ((ff<<10) / (x.ff>>8)) << 6;
   
-  a <<= 10;  b >>= 8;  a /= b;  a <<= 6;
+  a <<= 10;  b >>= 8;  
   
-  if(sign!=false)  { a = -a; }          // correct sign
+  if(b != int64_t(0))
+  {
+    a /= b;  a <<= 6;
   
-  ff = a;
+    if(sign!=false)  { a = -a; }           // correct sign
+  
+    ff = a;
+  }
+  else
+  {
+    if( ff * x.ff >= 0 )
+    {
+      ff = ( !(uint64_t(0)) ) >> 2;        // just very big positive value
+    }
+    else
+    {
+      ff = -( ( !(uint64_t(0)) ) >> 2);    // just very big negative value
+    }
+  }
   
 #endif
   
