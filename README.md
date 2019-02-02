@@ -22,6 +22,12 @@ Class fixed: floating point fast emulation using integer (64-bit) arithmetic
  * 
  * #define  __fixed_use_float_for_div
  * 
+ * If your hardware platform stores in memory floating-point numbers according to the IEEE 754 standard,
+ * then multiplication and division by 2^24 when converting from/to type float/double is much faster to produce by adding (subtracting) to(from) the exponent of the number 24
+ * To use just such a faster method, uncomment the line (make sure that sizeof(double)==64_bits in your case !!!):
+ * 
+ * #define  __fixed_use_fast_float_convertion
+ * 
  * 
  * (russian language annotation):
  * 
@@ -46,9 +52,15 @@ Class fixed: floating point fast emulation using integer (64-bit) arithmetic
  * 
  * #define  __fixed_use_float_for_div
  * 
+ * Если на Вашей аппаратной платформе числа с плавающей запятой хранятся в памяти согласно стандарта IEEE 754,
+ * то умножение и деление на 2^24 при преобразование из/в тип float/double гораздо быстрее производить путём добавления(вычитания) к(из) экспоненте(ы) числа 24
+ * Для использования именно такого более быстрого метода раскоментируйте строчку  (обязательно убедитесь что sizeof(double)==64_bits в вашем случае!!!):
+ * 
+ * #define  __fixed_use_fast_float_convertion
+ * 
  * 
  * by Vasyl Ruskykh  (mailto: domanet.adm@gmail.com,  https://www.facebook.com/vasyl.diver)
  * 
- * last updated:  2019-02-01
+ * last updated:  2019-02-02
  * 
  
