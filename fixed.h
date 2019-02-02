@@ -21,7 +21,7 @@
  * 
  * If your hardware platform stores in memory floating-point numbers according to the IEEE 754 standard,
  * then multiplication and division by 2^24 when converting from/to type float/double is much faster to produce by adding (subtracting) to(from) the exponent of the number 24
- * To use just such a faster method, uncomment the line (make sure that sizeof(double)==64_bits in your case !!!):
+ * To use just such a faster method, uncomment the line:
  * 
  * #define  __fixed_use_fast_float_convertion
  * 
@@ -50,7 +50,7 @@
  * 
  * Если на Вашей аппаратной платформе числа с плавающей запятой хранятся в памяти согласно стандарта IEEE 754,
  * то умножение и деление на 2^24 при преобразование из/в тип float/double гораздо быстрее производить путём добавления(вычитания) к(из) экспоненте(ы) числа 24
- * Для использования именно такого более быстрого метода раскоментируйте строчку  (обязательно убедитесь что sizeof(double)==64_bits в вашем случае!!!):
+ * Для использования именно такого более быстрого метода раскоментируйте строчку:
  * 
  * #define  __fixed_use_fast_float_convertion
  * 
@@ -212,16 +212,24 @@ inline fixed::fixed(double x)
   //
 #ifdef  __fixed_use_fast_float_convertion
   
+if(sizeof(double)==8)  // 64 bits
+{
   union 
   {
     double    f64;
-    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+    uint64_t  i64;
   } z;
 
   z.f64 = x;
   z.i64 += uint64_t(24) << 52;    // adding 24 to the exponent according IEEE_754 that is equivalent to multiplying by 2^24
                                   // potentional bug!  be sure that your floating-point values are less than ~2^100 !!!
   ff = int64_t(z.f64);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
+  return;
+}
+else      // а может быть другой размер типа double ???
+{
+  ff = int64_t( x * double(uint32_t(1)<<24) );    // multiply using floating-point operation
+}
   
 #else
 
@@ -236,18 +244,40 @@ inline fixed::fixed(float x)
 {
   //
 #ifdef  __fixed_use_fast_float_convertion
-  
+
+if(sizeof(float)==8)  // 64 bits
+{
   union 
   {
-    double    f64;
-    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+    float     f64;
+    uint64_t  i64;
   } z;
 
-  z.f64 = double(x);
+  z.f64 = x;
   z.i64 += uint64_t(24) << 52;    // adding 24 to the exponent according IEEE_754 that is equivalent to multiplying by 2^24
 
   ff = int64_t(z.f64);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
-  
+  return;
+}
+if(sizeof(float)==4)  // 32 bits
+{
+  union 
+  {
+    float     f32;
+    uint64_t  i32;
+  } z;
+
+  z.f32 = x;
+  z.i32 += uint32_t(24) << 23;    // adding 24 to the exponent according IEEE_754 that is equivalent to multiplying by 2^24
+
+  ff = int64_t(z.f32);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
+  return;
+}
+else      // а может быть другой размер типа float ???
+{
+  ff = int64_t( x * float(uint32_t(1)<<24) );    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
+}
+
 #else
 
   ff = int64_t( x * float(uint32_t(1)<<24) );    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
@@ -435,5 +465,4 @@ inline fixed& fixed::operator /= (const fixed &x)
   
   return (*this);
 }
-
 
