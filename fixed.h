@@ -62,8 +62,8 @@
  */
  
 
-//#define  __fixed_use_float_for_div
-//#define  __fixed_use_fast_float_convertion
+#define  __fixed_use_float_for_div
+#define  __fixed_use_fast_float_convertion
 
 
 class fixed
@@ -301,7 +301,14 @@ if(sizeof(double)==8)  // 64 bits
   } z;
 
   z.f64 = double(ff);
-  z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+  
+  register uint64_t a = z.i64;
+
+  if( (a<<1) < (uint64_t(25)<<53) )  { return 0.0; }    // return 0 if the shifted exponent less than 25
+
+  z.i64 = a - (uint64_t(24) << 52);    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+
+  //z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
 
   return z.f64; 
 }
@@ -333,7 +340,12 @@ if(sizeof(float)==8)  // 64 bits
   } z;
 
   z.f64 = float(ff);
-  z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+
+  register uint64_t a = z.i64;
+
+  if( (a<<1) < (uint64_t(25)<<53) )  { return 0.0; }    // return 0 if the shifted exponent less than 25
+
+  z.i64 = a - (uint64_t(24) << 52);    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
 
   return z.f64; 
 }
@@ -346,7 +358,12 @@ if(sizeof(float)==4)  // 32 bits
   } z;
 
   z.f32 = float(ff);
-  z.i32 -= uint32_t(24) << 23;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+
+  register uint32_t a = z.i32;
+
+  if( (a<<1) < (uint32_t(25)<<24) )  { return 0.0; }    // return 0 if the shifted exponent less than 25
+
+  z.i32 = a - (uint32_t(24) << 23);    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
 
   return z.f32; 
 }
