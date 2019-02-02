@@ -62,8 +62,8 @@
  */
  
 
-#define  __fixed_use_float_for_div
-#define  __fixed_use_fast_float_convertion
+//#define  __fixed_use_float_for_div
+//#define  __fixed_use_fast_float_convertion
 
 
 class fixed
