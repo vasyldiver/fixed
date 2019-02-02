@@ -3,7 +3,6 @@
  * 
  * On some hardware platforms (especially without FPU - math coprocessor), integer arithmetic operations are performed significantly faster than floating point operations
  * 
- * To perform operations on floating point numbers using integer arithmetic
  * floating point value is multiplied by 2^24, the integer part is taken and stored as a 64-bit signed integer (int64_t)
  * thus it can be considered that 40 bits (out of 64) are used for the integer part, and 24 bits for the fractional (non-integer in binary representation) part of a real number
  * 
@@ -20,6 +19,12 @@
  * 
  * #define  __fixed_use_float_for_div
  * 
+ * If your hardware platform stores in memory floating-point numbers according to the IEEE 754 standard,
+ * then multiplication and division by 2^24 when converting from/to type float/double is much faster to produce by adding (subtracting) to(from) the exponent of the number 24
+ * To use just such a faster method, uncomment the line (make sure that sizeof(double)==64_bits in your case !!!):
+ * 
+ * #define  __fixed_use_fast_float_convertion
+ * 
  * 
  * (russian language annotation):
  * 
@@ -27,7 +32,6 @@
  * 
  * На некоторых аппаратных платформах (особенно без математического сопроцессора) целочисленные арифметические операции выполняются существенно быстрее операций с плавающей запятой
  * 
- * Для выполнения операций над числами с плавающей запятой с помощью целочисленной арифметики
  * вещественнное число с плавающей запятой умножается на 2^24, берётся целая часть и хранится как 64-битное знаковое целое (тип int64_t)
  * таким образом можно считать что 40 бит (из 64) используются для целой части, а 24 бита - для дробной (не целой в двоичном представлении) части вещественного числа
  * 
@@ -44,15 +48,22 @@
  * 
  * #define  __fixed_use_float_for_div
  * 
+ * Если на Вашей аппаратной платформе числа с плавающей запятой хранятся в памяти согласно стандарта IEEE 754,
+ * то умножение и деление на 2^24 при преобразование из/в тип float/double гораздо быстрее производить путём добавления(вычитания) к(из) экспоненте(ы) числа 24
+ * Для использования именно такого более быстрого метода раскоментируйте строчку  (обязательно убедитесь что sizeof(double)==64_bits в вашем случае!!!):
+ * 
+ * #define  __fixed_use_fast_float_convertion
+ * 
  * 
  * by Vasyl Ruskykh  (mailto: domanet.adm@gmail.com,  https://www.facebook.com/vasyl.diver)
  * 
- * last updated:  2019-02-01
+ * last updated:  2019-02-02
  * 
  */
  
 
 //#define  __fixed_use_float_for_div
+//#define  __fixed_use_fast_float_convertion
 
 
 class fixed
@@ -60,7 +71,7 @@ class fixed
   int64_t ff;
 
 public:
-  // constructors
+  // конструкторы
   //
   inline fixed()            { ff = 0; }
   inline fixed(int8_t  x)   { register int64_t a = int64_t(x);  ff = (a < 0) ? -((-a)<<24) : (a<<24); }
@@ -71,8 +82,8 @@ public:
   inline fixed(uint16_t x)  { ff = int64_t(x) << 24; }
   inline fixed(uint32_t x)  { ff = int64_t(x) << 24; }
   inline fixed(uint64_t x)  { ff = int64_t(x) << 24; }
-  inline fixed(float x)     { ff = int64_t( x *  float(uint32_t(1)<<24) ); }    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
-  inline fixed(double x)    { ff = int64_t( x * double(uint32_t(1)<<24) ); }
+  inline fixed(float x);    //     { ff = int64_t( x *  float(uint32_t(1)<<24) ); }    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
+  inline fixed(double x);
 
   // оператор присваивания 
   //
@@ -84,9 +95,10 @@ public:
   
   // преобразование к стандартным типам данных
   //
-  inline operator float() const   { return float(ff)/float(uint32_t(1)<<24); }
-  inline operator int()   const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return  int(a>>24);} }
-  inline operator long()  const   { register int64_t a = ff;  if(a < 0) { return -long((-a)>>24);} else { return long(a>>24);} }
+  inline operator double() const;
+  inline operator  float() const;
+  inline operator    int() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return  int(a>>24);} }
+  inline operator   long() const   { register int64_t a = ff;  if(a < 0) { return -long((-a)>>24);} else { return long(a>>24);} }
 
   // базовые арифметические операции внутри одного типа
   //
@@ -95,6 +107,7 @@ public:
   inline fixed operator * (const fixed &x) const;
   inline fixed operator / (const fixed &x) const;
 
+  
   // некоторые арифметические операции (умножение) с другими типами, которые намного быстрее сделать не приводя (не преобразовывая) к типу fixed
   //
   inline fixed operator * (const  int16_t &x) const  { fixed z;  z.ff = ff * x;  return z; }
@@ -116,7 +129,10 @@ public:
   inline fixed operator / (const uint64_t &x) const  { fixed z;  z.ff = float(ff) / float(x);  return z; }
   //
 #endif
-  
+
+
+#ifndef __fixed_use_fast_float_convertion
+  //
   // умножение с типом float/double быстрее сделать средствами арифметики с плавающей запятой, потому как при приведении к типу fixed используется операция умножения двух типов float*float
   //
   inline fixed operator * (const float  &x) const  { fixed z;  z.ff = float(ff) * float(x);  return z; }
@@ -132,6 +148,8 @@ public:
   //
   inline fixed& operator /=(const float  &x) { ff = float(ff) / float(x);  return (*this); }
   inline fixed& operator /=(const double &x) { ff = float(ff) / float(x);  return (*this); }
+  //
+#endif
 
   
   // арифметическая операция к самому объекту с тем же типом данных
@@ -141,6 +159,7 @@ public:
   inline fixed& operator *=(const fixed &x);
   inline fixed& operator /=(const fixed &x);
 
+  
   // арифметическая операция к самому объекту с другим типом данных, которую можно реализовать быстрее чем через приведение типов
   //
   inline fixed& operator +=(const  int16_t &x)  { register int64_t a = int64_t(x);  if(a < 0) {ff -= ((-a)<<24);} else {ff += (a<<24);}  return (*this); }    // { ff += (x < 0) ? -(int64_t(-x)<<24) : (int64_t(x)<<24); }
@@ -164,12 +183,17 @@ public:
   inline fixed& operator *=(const uint32_t &x)  { ff *= x;  return (*this); }
   inline fixed& operator *=(const uint64_t &x)  { ff *= x;  return (*this); }
   
+#ifndef __fixed_use_float_for_div      
+  //
   inline fixed& operator /=(const  int16_t &x)  { ff /= x;  return (*this); }
   inline fixed& operator /=(const  int32_t &x)  { ff /= x;  return (*this); }
   inline fixed& operator /=(const  int64_t &x)  { ff /= x;  return (*this); }
   inline fixed& operator /=(const uint16_t &x)  { ff /= x;  return (*this); }
   inline fixed& operator /=(const uint32_t &x)  { ff /= x;  return (*this); }
   inline fixed& operator /=(const uint64_t &x)  { ff /= x;  return (*this); }
+  //
+#endif
+
   
   // операции сравнения
   //
@@ -181,6 +205,106 @@ public:
   inline bool operator >=(const fixed &x) const  { return ff >= x.ff; }
   //
 };
+
+
+inline fixed::fixed(double x)
+{
+  //
+#ifdef  __fixed_use_fast_float_convertion
+  
+  union 
+  {
+    double    f64;
+    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+  } z;
+
+  z.f64 = x;
+  z.i64 += uint64_t(24) << 52;    // adding 24 to the exponent according IEEE_754 that is equivalent to multiplying by 2^24
+                                  // potentional bug!  be sure that your floating-point values are less than ~2^100 !!!
+  ff = int64_t(z.f64);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
+  
+#else
+
+  ff = int64_t( x * double(uint32_t(1)<<24) );    // multiply using floating-point operation
+  
+#endif
+  //
+}
+
+
+inline fixed::fixed(float x)
+{
+  //
+#ifdef  __fixed_use_fast_float_convertion
+  
+  union 
+  {
+    double    f64;
+    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+  } z;
+
+  z.f64 = double(x);
+  z.i64 += uint64_t(24) << 52;    // adding 24 to the exponent according IEEE_754 that is equivalent to multiplying by 2^24
+
+  ff = int64_t(z.f64);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
+  
+#else
+
+  ff = int64_t( x * float(uint32_t(1)<<24) );    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
+  
+#endif
+  //
+}
+
+
+inline fixed::operator double() const
+{
+  //
+#ifdef  __fixed_use_fast_float_convertion
+  
+  union 
+  {
+    double    f64;
+    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+  } z;
+
+  z.f64 = double(ff);
+  z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+
+  return z.f64; 
+
+#else
+
+  return double(ff)/double(uint32_t(1)<<24); 
+  
+#endif
+  //
+}
+
+
+inline fixed::operator float() const
+{
+  //
+#ifdef  __fixed_use_fast_float_convertion
+  
+  union 
+  {
+    double    f64;
+    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+  } z;
+
+  z.f64 = double(ff);
+  z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+
+  return float(z.f64); 
+
+#else
+
+  return float(ff)/float(uint32_t(1)<<24); 
+  
+#endif
+  //
+}
 
 
 inline fixed fixed::operator + (const fixed &x) const
