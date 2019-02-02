@@ -226,9 +226,9 @@ if(sizeof(double)==8)  // 64 bits
   ff = int64_t(z.f64);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
   return;
 }
-else      // а может быть другой размер типа double ???
+else      // size of double is not 64 bits
 {
-  ff = int64_t( x * double(uint32_t(1)<<24) );    // multiply using floating-point operation
+  ff = int64_t( x * double(uint32_t(1)<<24) );    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
 }
   
 #else
@@ -264,7 +264,7 @@ if(sizeof(float)==4)  // 32 bits
   union 
   {
     float     f32;
-    uint64_t  i32;
+    uint32_t  i32;
   } z;
 
   z.f32 = x;
@@ -273,14 +273,14 @@ if(sizeof(float)==4)  // 32 bits
   ff = int64_t(z.f32);            // and than convert to integer multiplyed by 2^24 value (using add 24 to the exponent method)
   return;
 }
-else      // а может быть другой размер типа float ???
+else     // size of float is not 32 or 64 bits!  (а такое бывает?)
 {
   ff = int64_t( x * float(uint32_t(1)<<24) );    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
 }
 
 #else
 
-  ff = int64_t( x * float(uint32_t(1)<<24) );    // единицу явно указываем 32-разрядной, чтобы при сдвиге влево на 24 разряда не "вылететь" за пределы разрядности
+  ff = int64_t( x * float(uint32_t(1)<<24) );    // multiply using floating-point operation
   
 #endif
   //
@@ -292,16 +292,23 @@ inline fixed::operator double() const
   //
 #ifdef  __fixed_use_fast_float_convertion
   
+if(sizeof(double)==8)  // 64 bits
+{
   union 
   {
     double    f64;
-    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+    uint64_t  i64;
   } z;
 
   z.f64 = double(ff);
   z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
 
   return z.f64; 
+}
+else      // size of double is not 64 bits
+{
+  return double(ff)/double(uint32_t(1)<<24); 
+}
 
 #else
 
@@ -317,16 +324,36 @@ inline fixed::operator float() const
   //
 #ifdef  __fixed_use_fast_float_convertion
   
+if(sizeof(float)==8)  // 64 bits
+{
   union 
   {
-    double    f64;
-    uint64_t  i64;                // be sure that the size of double is 64 bits!!!
+    float     f64;
+    uint64_t  i64;
   } z;
 
-  z.f64 = double(ff);
+  z.f64 = float(ff);
   z.i64 -= uint64_t(24) << 52;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
 
-  return float(z.f64); 
+  return z.f64; 
+}
+if(sizeof(float)==4)  // 32 bits
+{
+  union 
+  {
+    float     f32;
+    uint32_t  i32;
+  } z;
+
+  z.f32 = float(ff);
+  z.i32 -= uint32_t(24) << 23;    // substracting 24 to the exponent according IEEE_754 that is equivalent to dividing by 2^24
+
+  return z.f32; 
+}
+else      // size of float is not 32 or 64 bits!  (а такое бывает?)
+{
+  return float(ff)/float(uint32_t(1)<<24); 
+}
 
 #else
 
@@ -465,4 +492,5 @@ inline fixed& fixed::operator /= (const fixed &x)
   
   return (*this);
 }
+
 
