@@ -1,5 +1,7 @@
 /*
- * Class fixed: floating point fast emulation using integer 64 bit arithmetics  ("one-pass" operations, fast processing)
+ * Class fixed: floating point emulation using integer (64 bit) arithmetics
+ *
+ *   (each floating point operation is operated by single integer operation)
  * 
  * instead of:
  *
@@ -46,7 +48,9 @@
  * (russian language annotation):
  * 
  * Класс fixed - эмуляция операций с плавающей запятой с помощью целочисленной (64-bit) арифметики 
- * 
+ *
+ *   (любая арифметическая операция с плавающей точкой эмулируется с помощью ОДНОЙ целочисленной операции) 
+ *
  * вместо:
  * 
  *   float a, b, c;
