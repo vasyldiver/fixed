@@ -1,8 +1,8 @@
 /*
  * Class fixed: floating point emulation using integer (64 bit) arithmetics
- *
- *   (each floating point operation is operated by single integer operation)
  * 
+ *   (each floating point operation is operated by single integer operation)
+ *  
  * instead of:
  *
  *   float a, b, c;
@@ -11,29 +11,37 @@
  *
  *   fixed a, b, c;
  *
- * Thus, it is enough to change only 'float' (or 'double') to 'fixed' when declaring variables. For the rest, no changes are needed in the program (except, possibly, type conversion in some places)
+ * Thus, it is enough to change only 'float' (or 'double') to 'fixed' in your code when declaring variables. 
+ * For the rest, no changes are needed in the program (except, possibly, type conversion in some places)
  *
- * Thanks to the features of C ++, operations with variables of the fixed type are performed in the same way as with the type float or double, for example:
+ * Thanks to the features of C ++, operations with variables of the fixed type are performed in the same way 
+ * as with the type float or double, for example:
  * 
  *   if( (a+b)/c < 0.0 )  { c -= a*b; }
  * 
  * 
- * On some hardware platforms (especially without FPU - math coprocessor), integer arithmetic operations are performed significantly faster than floating point operations
+ * On some hardware platforms (especially without FPU - math coprocessor), integer arithmetic operations are performed
+ *  significantly faster than floating point operations
  * 
  * floating point value is multiplied by 2^24, the integer part is taken and stored as a 64-bit signed integer (int64_t)
- * thus, 40 bits (out of 64) are used for the integer part, and 24 bits for the fractional (non-integer in binary representation) part of a real number
+ * thus, 40 bits (out of 64) are used for the integer part, and 24 bits for the fractional 
+ *  (non-integer in binary representation) part of a real number
  * 
  * That is, the fixed class variables are numbers not with a floating point, but with a fixed point.
  * 
- * when converting back to type float, a 64-bit integer is converted to type float, then divisible by 2^24 (float(1<<24)), thereby obtaining a floating-point number
+ * when converting back to type float, a 64-bit integer is converted to type float, then divisible by 2^24 (float(1<<24)),
+ *  thereby obtaining a floating-point number
  * (if necessary, to convert 'fixed' value to an integer type int, long, etc., it's enough to shift the 64-bit stored integer to the right by 24 bits)
  * 
  * The operations of addition and subtraction of such numbers are performed "in one pass” by adding (subtracting) 64-bit stored integers
  * 
- * Multiply and divide operations are also performed "in one pass" by multiplying and dividing over 64-bit integers, but with an additional shift of digits (so the original stored values are already multiplied by 2^24)
- * when processing, 8 bits of accuracy are lost when multiplying and about 6 bits when dividing, there we can assume that only 16(18) bits of accuracy for the fractional part of the numbers actually "work" when multiplying and dividing
+ * Multiply and divide operations are also performed "in one pass" by multiplying and dividing over 64-bit integers, 
+ *  but with an additional shift of digits (so the original stored values are already multiplied by 2^24)
+ * when processing, 8 bits of accuracy are lost when multiplying and about 6 bits when dividing, there we can assume that
+ *  only 16(18) bits of accuracy for the fractional part of the numbers actually "work" when multiplying and dividing
  * 
- * On some hardware platforms (for example, Arduino Uno) the operation of dividing two 64-bit integers takes longer (more CPU ticks) than the operation of dividing two floating point values,
+ * On some hardware platforms (for example, Arduino Uno) the operation of dividing two 64-bit integers takes longer 
+ *  (more CPU ticks) than the operation of dividing two floating point values,
  * therefore, to use the floating-point arithmetic for (only) division operation, just uncomment the line:
  * 
  * #define  __fixed_use_float_for_div
@@ -48,9 +56,9 @@
  * (russian language annotation):
  * 
  * Класс fixed - эмуляция операций с плавающей запятой с помощью целочисленной (64-bit) арифметики 
- *
+ * 
  *   (любая арифметическая операция с плавающей точкой эмулируется с помощью ОДНОЙ целочисленной операции) 
- *
+ * 
  * вместо:
  * 
  *   float a, b, c;
@@ -59,14 +67,15 @@
  * 
  *   fixed a, b, c;
  * 
- * Таким образом, достаточно только поменять только 'float' (или 'double') на 'fixed' при объявлении переменных.  В остальном не нужны никакие изменения в программном (кроме, возможно, приведения типов)
+ * Таким образом, достаточно только поменять только 'float' (или 'double') на 'fixed' при объявлении переменных.  
+ *  В остальном не нужны никакие изменения в программном (кроме, возможно, приведения типов)
  * 
  * Благодаря возможностям C++, операции с переменными типа fixed производтся так же как и с типом float или double,  например:
  * 
  *   if( (a+b)/c < 0.0 )  { c -= a*b; }
  * 
  * 
- * На некоторых аппаратных платформах (особенно без математического сопроцессора) целочисленные арифметические операции выполняются существенно быстрее операций с плавающей запятой
+ * На некоторых аппаратных платформах (особенно без математического сопроцессора) целочисленные арифметические операции  выполняются существенно быстрее операций с плавающей запятой
  * 
  * вещественнное число с плавающей запятой умножается на 2^24, берётся целая часть и хранится как 64-битное знаковое целое (тип int64_t)
  * таким образом, 40 бит (из 64) используются для целой части, а 24 бита - для дробной (не целой в двоичном представлении) части вещественного числа,
@@ -77,8 +86,10 @@
  * 
  * Операции сложения и вычитания таких чисел выполняются в один "проход" путём сложения(вычитания) 64-битных хранимых целых
  * 
- * Операции умножения и деления тоже совершаются "в один проход" с помощью умножения и деления над 64-битными целыми, но с дополнительным сдвигом разрядов (так исходные хранимые величины уже умножены на 2^24)
- * при этом теряется 8 бит точности при умножении и около 6 бит при делении, там образом можно считать что реально "работают" только 16(18) бит точности для дробной части чисел в операциях умножения и деления
+ * Операции умножения и деления тоже совершаются "в один проход" с помощью умножения и деления над 64-битными целыми, 
+ *  но с дополнительным сдвигом разрядов (так исходные хранимые величины уже умножены на 2^24)
+ * при этом теряется 8 бит точности при умножении и около 6 бит при делении, там образом можно считать что реально "работают"
+ *  только 16(18) бит точности для дробной части чисел в операциях умножения и деления
  * 
  * На некоторых аппаратных платформах (например, Arduino Uno) операция деления двух 64-битных целых происходит всё же дольше операции деления двух чисел с плаващей запятой,
  * поэтому чтобы операцию деления двух чисел типа 'fixed' производить именно средствами арифметики с плавающей запятой, раскоментируйте строчку:
@@ -656,5 +667,4 @@ inline fixed& fixed::operator /= (const fixed &x)
   
   return (*this);
 }
-
 
