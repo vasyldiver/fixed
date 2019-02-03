@@ -11,8 +11,8 @@ Class fixed: floating point emulation using integer (64 bit) arithmetics
  *
  *   fixed a, b, c;
  *
- * Thus, it is enough to change only 'float' (or 'double') to 'fixed' when declaring variables. For the rest, 
- *  no changes are needed in the program (except, possibly, type conversion in some places)
+ * Thus, it is enough to change only 'float' (or 'double') to 'fixed' in your code when declaring variables. 
+ * For the rest, no changes are needed in the program (except, possibly, type conversion in some places)
  *
  * Thanks to the features of C ++, operations with variables of the fixed type are performed in the same way 
  *  as with the type float or double, for example:
