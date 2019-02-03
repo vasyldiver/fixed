@@ -1,7 +1,7 @@
 # fixed
-Class fixed: floating point fast emulation using integer 64 bit arithmetics  ("one-pass" operations, fast processing)
+Class fixed: floating point emulation using integer (64 bit) arithmetics 
 
- * Class fixed: floating point fast emulation using integer 64 bit arithmetics  ("one-pass" operations, fast processing)
+ * Class fixed: each floating point operation is operated by single integer operation
  * 
  * instead of:
  *
