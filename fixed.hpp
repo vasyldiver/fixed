@@ -15,7 +15,7 @@
  * For the rest, no changes are needed in the program (except, possibly, type conversion in some places)
  *
  * Thanks to the features of C ++, operations with variables of the fixed type are performed in the same way 
- * as with the type float or double, for example:
+ *  as with the type float or double, for example:
  * 
  *   if( (a+b)/c < 0.0 )  { c -= a*b; }
  * 
@@ -108,7 +108,7 @@
  * last updated:  2019-02-02
  * 
  */
-  
+
 
 //#define  __fixed_use_float_for_div
 //#define  __fixed_use_fast_float_convertion
@@ -145,8 +145,13 @@ public:
   //
   inline operator double() const;
   inline operator  float() const;
-  inline operator    int() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return  int(a>>24);} }
-  inline operator   long() const   { register int64_t a = ff;  if(a < 0) { return -long((-a)>>24);} else { return long(a>>24);} }
+  inline operator    int() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return   int(a>>24);} }
+  inline operator  short() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return short(a>>24);} }
+  inline operator   long() const   { register int64_t a = ff;  if(a < 0) { return -long((-a)>>24);} else { return  long(a>>24);} }
+  inline operator unsigned   int() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return (unsigned   int)(a>>24);} }
+  inline operator unsigned short() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return (unsigned short)(a>>24);} }
+  inline operator unsigned  long() const   { register int64_t a = ff;  if(a < 0) { return  -int((-a)>>24);} else { return (unsigned  long)(a>>24);} }
+  inline operator int64_t() const  { register int64_t a = ff;  if(a < 0) { return -int64_t((-a)>>24);} else { return int64_t(a>>24);} }
 
   // базовые арифметические операции внутри одного типа
   //
@@ -327,7 +332,49 @@ public:
   inline bool operator >=(const double &x) const  { return operator >=(fixed(x)); };
 
   // операции сравнения с целыми числами
-  // ...
+  // 
+  inline bool operator ==(const  int16_t &x) const  { return int64_t(*this)==int64_t(x); };
+  inline bool operator ==(const  int32_t &x) const  { return int64_t(*this)==int64_t(x); };
+  inline bool operator ==(const  int64_t &x) const  { return int64_t(*this)==int64_t(x); };
+  inline bool operator ==(const uint16_t &x) const  { return int64_t(*this)==int64_t(x); };
+  inline bool operator ==(const uint32_t &x) const  { return int64_t(*this)==int64_t(x); };
+  inline bool operator ==(const uint64_t &x) const  { return int64_t(*this)==int64_t(x); };
+
+  inline bool operator !=(const  int16_t &x) const  { return int64_t(*this)!=int64_t(x); };
+  inline bool operator !=(const  int32_t &x) const  { return int64_t(*this)!=int64_t(x); };
+  inline bool operator !=(const  int64_t &x) const  { return int64_t(*this)!=int64_t(x); };
+  inline bool operator !=(const uint16_t &x) const  { return int64_t(*this)!=int64_t(x); };
+  inline bool operator !=(const uint32_t &x) const  { return int64_t(*this)!=int64_t(x); };
+  inline bool operator !=(const uint64_t &x) const  { return int64_t(*this)!=int64_t(x); };
+
+  inline bool operator < (const  int16_t &x) const  { return int64_t(*this)< int64_t(x); };
+  inline bool operator < (const  int32_t &x) const  { return int64_t(*this)< int64_t(x); };
+  inline bool operator < (const  int64_t &x) const  { return int64_t(*this)< int64_t(x); };
+  inline bool operator < (const uint16_t &x) const  { return int64_t(*this)< int64_t(x); };
+  inline bool operator < (const uint32_t &x) const  { return int64_t(*this)< int64_t(x); };
+  inline bool operator < (const uint64_t &x) const  { return int64_t(*this)< int64_t(x); };
+
+  inline bool operator <=(const  int16_t &x) const  { return int64_t(*this)<=int64_t(x); };
+  inline bool operator <=(const  int32_t &x) const  { return int64_t(*this)<=int64_t(x); };
+  inline bool operator <=(const  int64_t &x) const  { return int64_t(*this)<=int64_t(x); };
+  inline bool operator <=(const uint16_t &x) const  { return int64_t(*this)<=int64_t(x); };
+  inline bool operator <=(const uint32_t &x) const  { return int64_t(*this)<=int64_t(x); };
+  inline bool operator <=(const uint64_t &x) const  { return int64_t(*this)<=int64_t(x); };
+
+  inline bool operator > (const  int16_t &x) const  { return int64_t(*this)> int64_t(x); };
+  inline bool operator > (const  int32_t &x) const  { return int64_t(*this)> int64_t(x); };
+  inline bool operator > (const  int64_t &x) const  { return int64_t(*this)> int64_t(x); };
+  inline bool operator > (const uint16_t &x) const  { return int64_t(*this)> int64_t(x); };
+  inline bool operator > (const uint32_t &x) const  { return int64_t(*this)> int64_t(x); };
+  inline bool operator > (const uint64_t &x) const  { return int64_t(*this)> int64_t(x); };
+
+  inline bool operator >=(const  int16_t &x) const  { return int64_t(*this)>=int64_t(x); };
+  inline bool operator >=(const  int32_t &x) const  { return int64_t(*this)>=int64_t(x); };
+  inline bool operator >=(const  int64_t &x) const  { return int64_t(*this)>=int64_t(x); };
+  inline bool operator >=(const uint16_t &x) const  { return int64_t(*this)>=int64_t(x); };
+  inline bool operator >=(const uint32_t &x) const  { return int64_t(*this)>=int64_t(x); };
+  inline bool operator >=(const uint64_t &x) const  { return int64_t(*this)>=int64_t(x); };
+
   //
 };
 
